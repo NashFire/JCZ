@@ -1,0 +1,55 @@
+{
+    "secciones": [
+        {
+            "nombre": "tatuajes",
+            "titulo": "Arte en la Piel: Tatuajes Personalizados",
+            "descripcion": "En Dakatattoo transformamos tus ideas en obras de arte atemporales. Contamos con artistas especializados en diversos estilos como realismo, tradicional, geométrico, fineline y blackwork. Priorizamos la higiene, la seguridad y la total personalización de cada diseño.",
+            "anuncios": [
+                {
+                    "titulo": "Estilos y Diseños Únicos",
+                    "imagen": "https://images.unsplash.com/photo-1598371839696-5c5bb00bdc28?auto=format&fit=crop&w=600&q=80",
+                    "descripcion": "Desde trazos finos y minimalistas hasta piezas realistas a gran escala. Trabajamos contigo desde el boceto inicial para plasmar tu identidad."
+                },
+                {
+                    "titulo": "Máxima Higiene y Cuidado",
+                    "imagen": "https://images.unsplash.com/photo-1590247813693-5541f1c609fd?auto=format&fit=crop&w=600&q=80",
+                    "descripcion": "Utilizamos materiales 100% esterilizados, agujas monouso de última generación y tintas homologadas para garantizar tu total seguridad y una curación óptima."
+                }
+            ]
+        },
+        {
+            "nombre": "piercings",
+            "titulo": "Anillado Profesional y Joyería Corporal",
+            "descripcion": "Realizamos todo tipo de piercings corporales y faciales con técnicas avanzadas que minimizan las molestias. Te asesoramos sobre el mejor ángulo, tipo de perforación y los cuidados posteriores esenciales.",
+            "anuncios": [
+                {
+                    "titulo": "Perforaciones con Precisión",
+                    "imagen": "https://images.unsplash.com/photo-1562157705-52c4155d40a7?auto=format&fit=crop&w=600&q=80",
+                    "descripcion": "Nuestros anilladores cuentan con años de experiencia, garantizando un procedimiento rápido, limpio y adaptado a la anatomía de tu cuerpo."
+                },
+                {
+                    "titulo": "Joyería de Alta Calidad",
+                    "imagen": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80",
+                    "descripcion": "Disponemos de una amplia gama de piezas de titanio grado implante y oro de 14k, ideales para evitar alergias y asegurar una cicatrización perfecta."
+                }
+            ]
+        },
+        {
+            "nombre": "micropigmentacion",
+            "titulo": "Micropigmentación y Estética Avanzada",
+            "descripcion": "Realza tu belleza natural de forma duradera. Especialistas en técnicas de maquillaje permanente para cejas, labios y eye-liner, logrando resultados hiperrealistas y elegantes adaptados a tus facciones.",
+            "anuncios": [
+                {
+                    "titulo": "Microblading & Cejas Perfectas",
+                    "imagen": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80",
+                    "descripcion": "Diseñamos tus cejas pelo a pelo mediante técnicas que aportan densidad, simetría y un aspecto completamente natural y rejuvenecido."
+                },
+                {
+                    "titulo": "Efecto Labios Acuarela",
+                    "imagen": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&w=600&q=80",
+                    "descripcion": "Define el contorno y aporta un tono saludable y homogéneo a tus labios, eliminando asimetrías con un acabado sutil y de larga duración."
+                }
+            ]
+        }
+    ]
+}
