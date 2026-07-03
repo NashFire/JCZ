@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Fichas - Judo Club Zaragoza</title>
+    <style>
+        /* --- ESTILOS GENERALES Y VISTA EN PANTALLA --- */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* Zona interactiva superior (No se imprime) */
+        .no-print-zone {
+            max-width: 950px;
+            margin: 0 auto 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .no-print-zone h2 {
+            margin-top: 0;
+            color: #1b365d;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .selector-formato {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .selector-formato label {
+            margin: 0 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .json-textarea {
+            width: 100%;
+            height: 140px;
+            margin: 10px 0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 11px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+
+        .acciones-panel {
+            text-align: center;
+        }
+
+        .btn-action {
+            background-color: #1b365d;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 5px;
+        }
+
+        .btn-action:hover {
+            background-color: #0f2343;
+        }
+
+        .btn-print {
+            background-color: #28a745;
+        }
+
+        .btn-print:hover {
+            background-color: #218838;
+        }
+
+        /* --- CONTENEDOR DE FICHAS --- */
+        #fichas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+        }
+
+        /* --- MAQUETACIÓN EXACTA DIN-A4 --- */
+        .ficha-a4 {
+            background: white;
+            width: 210mm;
+            height: 297mm;
+            padding: 18mm 15mm 15mm 15mm;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* --- CABECERA --- */
+        .cabecera {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #1b365d;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .cabecera-logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .cabecera-info-club {
+            flex-grow: 1;
+            margin-left: 15px;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .cabecera-info-club h2 {
+            margin: 0 0 4px 0;
+            color: #1b365d;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cabecera-titulo-documento {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .cabecera-titulo-documento h1 {
+            margin: 0;
+            font-size: 16px;
+            color: #1b365d;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .curso-escolar {
+            display: inline-block;
+            background-color: #1b365d;
+            color: white;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 3px;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        /* --- SECCIONES INTERNAS --- */
+        .seccion {
+            margin-bottom: 12px;
+        }
+
+        .seccion-titulo {
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            background-color: #1b365d;
+            padding: 4px 8px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .grid-datos {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px 15px;
+            font-size: 12px;
+        }
+
+        .dato {
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #444;
+            margin-right: 4px;
+        }
+
+        .clases-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            font-size: 10px;
+        }
+
+        .clase-item {
+            border: 1px solid #ccc;
+            padding: 5px 2px;
+            text-align: center;
+            border-radius: 4px;
+            text-transform: capitalize;
+            background-color: #fcfcfc;
+            color: #777;
+        }
+
+        .clase-item.activa {
+            background-color: #1b365d;
+            color: white;
+            font-weight: bold;
+            border-color: #1b365d;
+        }
+
+        .seccion-firmas {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .firmas-container {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            padding-top: 25px;
+        }
+
+        .firma-box {
+            width: 45%;
+            border-top: 1px solid #333;
+            text-align: center;
+            padding-top: 5px;
+            color: #555;
+        }
+
+        /* --- AJUSTES DE IMPRESIÓN --- */
+        @media print {
+            html, body {
+                background-color: white;
+                padding: 0 !important;
+                margin: 0 !important;
+                height: auto;
+            }
+
+            .no-print-zone {
+                display: none !important;
+            }
+
+            #fichas-container {
+                gap: 0 !important;
+                display: block !important;
+            }
+
+            .ficha-a4 {
+                width: 210mm;
+                height: 297mm;
+                padding: 15mm;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+                page-break-before: auto !important;
+                page-break-after: always !important;
+                break-after: page;
+            }
+            
+            .ficha-a4:last-child {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+
+    <script>
+        // --- DATOS DE EJEMPLO ---
+        const ejemploJSON = [
+            {
+                "alumno": { "nombre": "Carlos", "apellidos": "García Pérez", "dni": "12345678X", "nacimiento": "12/04/2012", "colegio": "C.P. El Pilar", "telefono": "600111222" },
+                "padre": { "nombre": "Juan", "apellidos": "García López", "dni": "87654321Y", "nacimiento": "05/08/1978", "telefono": "611222333" },
+                "madre": { "nombre": "María", "apellidos": "Pérez Gómez", "dni": "56781234Z", "nacimiento": "22/11/1980", "telefono": "622333444" },
+                "clase": "alevin",
+                "forma_pago": { "tipo": "banco", "titular": "Juan García López", "cuenta": "ES21 1234 5678 9012 3456 7890" }
+            },
+            {
+                "alumno": { "nombre": "Lucía", "apellidos": "Fernández Ruiz", "dni": "87654321A", "nacimiento": "25/09/2015", "colegio": "Colegio Salesianos", "telefono": "633444555" },
+                "padre": { "nombre": "Pedro", "apellidos": "Fernández Marín", "dni": "11223344B", "nacimiento": "14/02/1975", "telefono": "644555666" },
+                "madre": { "nombre": "Ana", "apellidos": "Ruiz Sancho", "dni": "44332211C", "nacimiento": "30/06/1977", "telefono": "655666777" },
+                "clase": "iniciacion",
+                "forma_pago": { "tipo": "efectivo", "titular": "", "cuenta": "" }
+            }
+        ];
+
+        const ejemploCSV = `alumno_nombre;alumno_apellidos;alumno_dni;alumno_nacimiento;alumno_colegio;alumno_telefono;padre_nombre;padre_apellidos;padre_dni;padre_nacimiento;padre_telefono;madre_nombre;madre_apellidos;madre_dni;madre_nacimiento;madre_telefono;clase;pago_tipo;pago_titular;pago_cuenta
+Carlos;García Pérez;12345678X;12/04/2012;C.P. El Pilar;600111222;Juan;García López;87654321Y;05/08/1978;611222333;María;Pérez Gómez;56781234Z;22/11/1980;622333444;alevin;banco;Juan García López;ES21 1234 5678 9012 3456 7890
+Lucía;Fernández Ruiz;87654321A;25/09/2015;Colegio Salesianos;633444555;Pedro;Fernández Marín;11223344B;14/02/1975;644555666;Ana;Ruiz Sancho;44332211C;30/06/1977;655666777;iniciacion;efectivo;;`;
+
+        const listaClases = ["iniciación", "benjamín", "alevin", "infantil", "cadete", "junior", "senior"];
+
+        // --- FUNCIONES DE CONTROL ---
+
+        function cambiarFormatoDeEntrada() {
+            const formato = document.querySelector('input[name="formato"]:checked').value;
+            const textarea = document.getElementById('data-input');
+            const textoAyuda = document.getElementById('indicaciones-texto');
+
+            if (!textarea || !textoAyuda) return;
+
+            if (formato === 'json') {
+                textarea.value = JSON.stringify(ejemploJSON, null, 4);
+                textoAyuda.innerText = 'Modifica o pega tu estructura JSON abajo y haz clic en "Actualizar Fichas".';
+            } else {
+                textarea.value = ejemploCSV;
+                textoAyuda.innerText = 'Modifica o pega tus filas en CSV separadas por ";" (La primera fila debe incluir los encabezados).';
+            }
+        }
+
+        function convertirCSVAJson(csvText) {
+            const lineas = csvText.split('\n').filter(linea => linea.trim() !== '');
+            if (lineas.length < 2) {
+                alert("El CSV debe contener al menos la línea de cabeceras y una fila de datos.");
+                return null;
+            }
+
+            const cabeceras = lineas[0].split(';').map(c => c.trim());
+            const resultado = [];
+
+            for (let i = 1; i < lineas.length; i++) {
+                const columnas = lineas[i].split(';').map(col => col.trim());
+                let d = {};
+                
+                cabeceras.forEach((cabecera, index) => {
+                    d[cabecera] = columnas[index] || "";
+                });
+
+                const ficha = {
+                    alumno: { nombre: d.alumno_nombre, apellidos: d.alumno_apellidos, dni: d.alumno_dni, nacimiento: d.alumno_nacimiento, colegio: d.alumno_colegio, telefono: d.alumno_telefono },
+                    padre: { nombre: d.padre_nombre, apellidos: d.padre_apellidos, dni: d.padre_dni, nacimiento: d.padre_nacimiento, telefono: d.padre_telefono },
+                    madre: { nombre: d.madre_nombre, apellidos: d.madre_apellidos, dni: d.madre_dni, nacimiento: d.madre_nacimiento, telefono: d.madre_telefono },
+                    clase: d.clase,
+                    forma_pago: { tipo: d.pago_tipo, titular: d.pago_titular, cuenta: d.pago_cuenta }
+                };
+
+                resultado.push(ficha);
+            }
+            return resultado;
+        }
+
+        function procesarYRenderizar() {
+            const formato = document.querySelector('input[name="formato"]:checked').value;
+            const entrada = document.getElementById('data-input').value.trim();
+
+            if (formato === 'json') {
+                try {
+                    const datos = JSON.parse(entrada);
+                    generarFichasHTML(datos);
+                } catch (e) {
+                    alert("Error en el formato JSON. Revisa los corchetes y comillas.\nDetalle: " + e.message);
+                }
+            } else {
+                const datosProcesados = convertirCSVAJson(entrada);
+                if (datosProcesados) {
+                    generarFichasHTML(datosProcesados);
+                }
+            }
+        }
+
+        function generarFichasHTML(datosAlumnos) {
+            const container = document.getElementById('fichas-container');
+            if (!container) return;
+            container.innerHTML = ''; 
+
+            if (!Array.isArray(datosAlumnos)) {
+                alert("Estructura de datos incorrecta.");
+                return;
+            }
+
+            datosAlumnos.forEach(ficha => {
+                const fichaDiv = document.createElement('div');
+                fichaDiv.className = 'ficha-a4';
+
+                let detallesPago = '';
+                const tipoPago = (ficha.forma_pago && ficha.forma_pago.tipo) ? ficha.forma_pago.tipo.toLowerCase() : 'efectivo';
+                if (tipoPago === 'banco') {
+                    detallesPago = `
+                        <div class="dato"><span class="label">Titular Cuenta:</span> ${ficha.forma_pago.titular || ''}</div>
+                        <div class="dato"><span class="label">Nº Cuenta (IBAN):</span> ${ficha.forma_pago.cuenta || ''}</div>
+                    `;
+                } else {
+                    detallesPago = `
+                        <div class="dato" style="grid-column: span 2;"><span class="label">Información:</span> Pago directo en efectivo realizado en la secretaría del club.</div>
+                    `;
+                }
+
+                let clasesHTML = '';
+                listaClases.forEach(c => {
+                    const normalizadoFicha = ficha.clase ? ficha.clase.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : '';
+                    const normalizadoLista = c.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    
+                    const activa = normalizadoFicha === normalizadoLista ? 'activa' : '';
+                    const marca = normalizadoFicha === normalizadoLista ? '✔' : ' ';
+                    clasesHTML += `<div class="clase-item ${activa}">${marca} ${c}</div>`;
+                });
+
+                fichaDiv.innerHTML = `
+                    <div class="cabecera">
+                        <img class="cabecera-logo" src="https://www.judoclubzaragoza.com/wp-content/uploads/2024/08/logo-cuadrado-copia-150x150.jpg">
+                        <div class="cabecera-info-club">
+                            <h2>Judo Club Zaragoza</h2>
+                            <div>C/ Juan XXIII nº 19, local 2-B · 50010 Zaragoza</div>
+                            <div>Teléfono: 976 47 26 33 · judoclubzaragoza@gmail.com</div>
+                        </div>
+                        <div class="cabecera-titulo-documento">
+                            <h1>Ficha de Inscripción</h1>
+                            <span class="curso-escolar">Curso 2026/2027</span>
+                        </div>
+                    </div>
+
+                    <div class="seccion">
+                        <div class="seccion-titulo">1. Datos Personales del Alumno/a</div>
+                        <div class="grid-datos">
+                            <div class="dato"><span class="label">Apellidos:</span> ${ficha.alumno.apellidos || ''}</div>
+                            <div class="dato"><span class="label">Nombre:</span> ${ficha.alumno.nombre || ''}</div>
+                            <div class="dato"><span class="label">DNI / NIE:</span> ${ficha.alumno.dni || ''}</div>
+                            <div class="dato"><span class="label">Fecha Nacimiento:</span> ${ficha.alumno.nacimiento || ''}</div>
+                            <div class="dato"><span class="label">Centro Escolar:</span> ${ficha.alumno.colegio || ''}</div>
+                            <div class="dato"><span class="label">Teléfono:</span> ${ficha.alumno.telefono || ''}</div>
+                        </div>
+                    </div>
+
+                    <div class="seccion">
+                        <div class="seccion-titulo">2. Datos del Padre o Tutor Legal</div>
+                        <div class="grid-datos">
+                            <div class="dato" style="grid-column: span 2;"><span class="label">Nombre y Apellidos:</span> ${(ficha.padre.nombre || '')} ${(ficha.padre.apellidos || '')}</div>
+                            <div class="dato"><span class="label">DNI:</span> ${ficha.padre.dni || ''}</div>
+                            <div class="dato"><span class="label">Fecha Nacimiento:</span> ${ficha.padre.nacimiento || ''}</div>
+                            <div class="dato" style="grid-column: span 2;"><span class="label">Teléfono Contacto:</span> ${ficha.padre.telefono || ''}</div>
+                        </div>
+                    </div>
+
+                    <div class="seccion">
+                        <div class="seccion-titulo">3. Datos de la Madre o Tutora Legal</div>
+                        <div class="grid-datos">
+                            <div class="dato" style="grid-column: span 2;"><span class="label">Nombre y Apellidos:</span> ${(ficha.madre.nombre || '')} ${(ficha.madre.apellidos || '')}</div>
+                            <div class="dato"><span class="label">DNI:</span> ${ficha.madre.dni || ''}</div>
+                            <div class="dato"><span class="label">Fecha Nacimiento:</span> ${ficha.madre.nacimiento || ''}</div>
+                            <div class="dato" style="grid-column: span 2;"><span class="label">Teléfono Contacto:</span> ${ficha.madre.telefono || ''}</div>
+                        </div>
+                    </div>
+
+                    <div class="seccion">
+                        <div class="seccion-titulo">4. Categoría / Grupo de Edad</div>
+                        <div class="clases-grid">
+                            ${clasesHTML}
+                        </div>
+                    </div>
+
+                    <div class="seccion">
+                        <div class="seccion-titulo">5. Modalidad de Pago</div>
+                        <div class="grid-datos" style="margin-bottom: 6px;">
+                            <div class="dato" style="grid-column: span 2;">
+                                <span class="label">Método de abono seleccionado:</span> <span style="text-transform: uppercase; font-weight: bold; color: #1b365d;">${tipoPago}</span>
+                            </div>
+                        </div>
+                        <div class="grid-datos">
+                            ${detallesPago}
+                        </div>
+                    </div>
+
+                    <div class="seccion-firmas">
+                        <p style="font-size: 8px; color: #666; text-align: justify; margin: 0 0 10px 0; line-height: 1.2;">
+                            De conformidad con el RGPD, los datos aquí facilitados serán tratados por Judo Club Zaragoza para la organización interna, inscripciones federativas y envío de información del club. Podrá ejercitar sus derechos de acceso, rectificación, supresión y portabilidad remitiendo una solicitud firmada a la dirección postal del club acompañada de copia de su DNI.
+                        </p>
+                        <div class="firmas-container">
+                            <div class="firma-box">Firma del Padre / Madre / Tutor</div>
+                            <div class="firma-box">Sello y Firma Autorizada del Club</div>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(fichaDiv);
+            });
+        }
+
+        // Ejecutar inicialización una vez que el DOM esté completamente cargado
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('data-input').value = JSON.stringify(ejemploJSON, null, 4);
+            generarFichasHTML(ejemploJSON);
+        });
+    </script>
+</head>
+<body>
+
+    <div class="no-print-zone">
+        <h2>Panel de Configuración de Fichas</h2>
+        
+        <div class="selector-formato">
+            <span>Formato de origen:</span>
+            <label><input type="radio" name="formato" value="json" checked onchange="cambiarFormatoDeEntrada()"> JSON</label>
+            <label><input type="radio" name="formato" value="csv" onchange="cambiarFormatoDeEntrada()"> CSV (Separado por ;)</label>
+        </div>
+
+        <p id="indicaciones-texto" style="font-size: 13px; color: #666; margin-bottom: 5px; text-align: center;">
+            Modifica o pega tu estructura JSON abajo y haz clic en "Actualizar Fichas".
+        </p>
+        
+        <textarea id="data-input" class="json-textarea"></textarea>
+        
+        <div class="acciones-panel">
+            <button class="btn-action" onclick="procesarYRenderizar()">Actualizar Fichas</button>
+            <button class="btn-action btn-print" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+    </div>
+
+    <div id="fichas-container"></div>
+
+</body>
+</html>
